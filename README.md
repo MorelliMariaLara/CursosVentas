@@ -6,6 +6,8 @@ App: **http://localhost:8080**
 
 ## Arrancar en Windows
 
+**No uses F5 / Depurar en Visual Studio** (abre Edge a un puerto vacío y falla).
+
 1. Node.js LTS: https://nodejs.org/ (reiniciá la PC)
 2. En SSMS, creá la base si no existe:
 
@@ -22,7 +24,7 @@ copy /Y .env.example .env
 .\start-local.bat
 ```
 
-4. Cuando diga listo, abrí **http://localhost:8080** (Edge se abre solo).
+4. Abrí **http://localhost:8080** (no uses :3000).
 
 ```
 Admin: admin@academia.local

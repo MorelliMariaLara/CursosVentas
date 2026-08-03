@@ -1,0 +1,23 @@
+========================================
+  LEEME — COMO VER LA WEB
+========================================
+
+NO uses F5 / Depurar en Visual Studio.
+Eso abre Edge a un puerto vacío y muestra error.
+
+1) Asegurate de tener SQL Server corriendo
+   Instancia: LARA-NB\SQLEXPRESS02
+   Base:      Cursosventas
+
+2) Doble clic en:  start-local.bat
+
+3) Esperá a que diga listo
+
+4) Abrí en el navegador:
+   http://localhost:8080
+
+Admin: admin@academia.local
+Clave:  Admin123!
+
+Dejá la ventana negra ABIERTA.
+Si la cerrás, Edge da ERR_CONNECTION_REFUSED.

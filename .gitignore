@@ -30,6 +30,7 @@
 *.sln.docstates
 obj/
 bin/
+packages/
 
 # debug
 npm-debug.log*
