@@ -1,7 +1,8 @@
 /**
- * Arranque local con SQL Server Express.
+ * Arranque local — SQL Server + puerto 8080
  * Servidor: LARA-NB\SQLEXPRESS02
  * Base:     Cursosventas
+ * URL:      http://localhost:8080
  */
 const fs = require("fs");
 const path = require("path");
@@ -10,9 +11,11 @@ const http = require("http");
 
 const root = process.cwd();
 const isWin = process.platform === "win32";
+const PORT = process.env.PORT || "8080";
+const APP_LOCAL_URL = `http://localhost:${PORT}`;
 
 const DEFAULT_SQLSERVER_URL =
-  'sqlserver://LARA-NB\\SQLEXPRESS02;database=Cursosventas;integratedSecurity=true;trustServerCertificate=true';
+  "sqlserver://LARA-NB\\SQLEXPRESS02;database=Cursosventas;integratedSecurity=true;trustServerCertificate=true";
 
 function log(msg) {
   console.log(`\n==> ${msg}`);
@@ -21,7 +24,7 @@ function log(msg) {
 function fail(msg) {
   console.error(`\nERROR: ${msg}`);
   if (isWin) {
-    console.log("\nPresioná una tecla para cerrar...");
+    console.log("\nPresioná Enter para cerrar...");
     try {
       spawnSync("pause", { shell: true, stdio: "inherit" });
     } catch {
@@ -39,7 +42,10 @@ function run(command, args, opts = {}) {
     env: { ...process.env, ...opts.env },
   });
   if (result.status !== 0) {
-    fail(`Falló: ${command} ${args.join(" ")}\nRevisá que SQL Server esté corriendo y la base Cursosventas exista.`);
+    fail(
+      `Falló: ${command} ${args.join(" ")}\n` +
+        "Revisá que SQL Server (SQLEXPRESS02) esté corriendo y exista la base Cursosventas.",
+    );
   }
 }
 
@@ -47,7 +53,7 @@ function ensureNode() {
   const v = spawnSync("node", ["-v"], { encoding: "utf8", shell: true });
   if (v.status !== 0) {
     fail(
-      "Node.js no está instalado o no está en el PATH.\nInstalá LTS desde https://nodejs.org/ y reiniciá la PC.",
+      "Node.js no está en el PATH.\nInstalá LTS desde https://nodejs.org/ y reiniciá la PC.",
     );
   }
   console.log(`Node ${String(v.stdout || "").trim()}`);
@@ -57,50 +63,63 @@ function ensureEnv() {
   const envPath = path.join(root, ".env");
   const examplePath = path.join(root, ".env.example");
 
+  if (!fs.existsSync(envPath) && fs.existsSync(examplePath)) {
+    fs.copyFileSync(examplePath, envPath);
+    log("Se creó .env desde .env.example");
+  }
+
   if (!fs.existsSync(envPath)) {
-    if (fs.existsSync(examplePath)) {
-      fs.copyFileSync(examplePath, envPath);
-      log("Se creó .env desde .env.example");
-    } else {
-      fail("No existe .env ni .env.example");
-    }
+    fail("No existe .env");
   }
 
   let content = fs.readFileSync(envPath, "utf8");
 
-  // Si todavía tiene SQLite, o no tiene DATABASE_URL, poner SQL Server
-  const current = content.match(/^DATABASE_URL=(.*)$/m);
-  const value = current ? current[1] : "";
-  const isSqlite = value.includes("file:") || value.includes("dev.db");
-  if (!current || isSqlite || value.trim() === '""' || value.trim() === "") {
+  // Forzar SQL Server (si había SQLite u otra URL inválida)
+  const urlMatch = content.match(/^DATABASE_URL=(.*)$/m);
+  const raw = urlMatch ? urlMatch[1] : "";
+  const needsSql =
+    !urlMatch ||
+    raw.includes("file:") ||
+    raw.includes("dev.db") ||
+    raw.trim() === '""' ||
+    raw.trim() === "";
+
+  if (needsSql) {
     content = content.replace(/^DATABASE_URL=.*$/m, "");
     content =
       `DATABASE_URL="${DEFAULT_SQLSERVER_URL}"\n` + content.trim() + "\n";
-    log("DATABASE_URL configurado a SQL Server (Cursosventas)");
+    log("DATABASE_URL -> SQL Server Cursosventas");
   }
 
+  // Puerto 8080
+  content = content.replace(/^NEXTAUTH_URL=.*$/m, `NEXTAUTH_URL="${APP_LOCAL_URL}"`);
+  content = content.replace(/^APP_URL=.*$/m, `APP_URL="${APP_LOCAL_URL}"`);
+  if (!/^NEXTAUTH_URL=/m.test(content)) {
+    content += `\nNEXTAUTH_URL="${APP_LOCAL_URL}"\n`;
+  }
+  if (!/^APP_URL=/m.test(content)) {
+    content += `\nAPP_URL="${APP_LOCAL_URL}"\n`;
+  }
   if (!/^AUTH_SECRET=/m.test(content)) {
     content +=
       '\nAUTH_SECRET="dev-secret-change-me-in-production-32chars"\n';
   }
-  if (!/^NEXTAUTH_URL=/m.test(content)) {
-    content += '\nNEXTAUTH_URL="http://localhost:3000"\n';
-  }
-  if (!/^APP_URL=/m.test(content)) {
-    content += '\nAPP_URL="http://localhost:3000"\n';
+  if (!/^PORT=/m.test(content)) {
+    content += `\nPORT=${PORT}\n`;
+  } else {
+    content = content.replace(/^PORT=.*$/m, `PORT=${PORT}`);
   }
 
   fs.writeFileSync(envPath, content);
-
-  const urlLine = content.match(/^DATABASE_URL=(.*)$/m);
-  console.log(`Usando ${urlLine ? urlLine[1] : "(sin URL)"}`);
+  const shown = content.match(/^DATABASE_URL=(.*)$/m);
+  console.log(`DB: ${shown ? shown[1] : "?"}`);
+  console.log(`URL: ${APP_LOCAL_URL}`);
 }
 
 function readDatabaseUrl() {
-  const envPath = path.join(root, ".env");
-  const content = fs.readFileSync(envPath, "utf8");
+  const content = fs.readFileSync(path.join(root, ".env"), "utf8");
   const m = content.match(/^DATABASE_URL="?(.*?)"?\s*$/m);
-  if (!m) fail("No se encontró DATABASE_URL en .env");
+  if (!m) fail("No hay DATABASE_URL en .env");
   return m[1];
 }
 
@@ -116,8 +135,8 @@ function ensureUploads() {
 }
 
 function ensureDeps() {
-  if (!fs.existsSync(path.join(root, "node_modules"))) {
-    log("Instalando dependencias (npm install)...");
+  if (!fs.existsSync(path.join(root, "node_modules", "next"))) {
+    log("npm install (puede tardar)...");
     run("npm", ["install"]);
   } else {
     log("Dependencias OK");
@@ -128,21 +147,17 @@ function ensureDatabase() {
   const databaseUrl = readDatabaseUrl();
   const env = { DATABASE_URL: databaseUrl };
 
-  log("Generando Prisma Client (SQL Server)...");
+  log("Prisma generate...");
   run("npx", ["prisma", "generate"], { env });
 
-  log("Sincronizando tablas en SQL Server (prisma db push)...");
-  console.log(
-    "Si falla la conexión: habilitá TCP/IP en SQL Server Configuration Manager",
-  );
-  console.log("y asegurate de que exista la base Cursosventas.\n");
+  log("Sincronizando tablas en SQL Server...");
   run("npx", ["prisma", "db", "push", "--accept-data-loss"], { env });
 
   log("Seed admin + curso demo...");
   run("npx", ["tsx", "prisma/seed.ts"], { env });
 }
 
-function waitForServer(url, attempts = 40) {
+function waitForServer(url, attempts = 60) {
   return new Promise((resolve) => {
     let left = attempts;
     const tick = () => {
@@ -161,14 +176,14 @@ function waitForServer(url, attempts = 40) {
 }
 
 async function openBrowser() {
-  const ok = await waitForServer("http://localhost:3000");
+  const ok = await waitForServer(APP_LOCAL_URL);
   if (!ok) {
-    console.warn("Abrí manualmente http://localhost:3000");
+    console.warn(`No respondió a tiempo. Abrí manualmente ${APP_LOCAL_URL}`);
     return;
   }
-  log("Abriendo Microsoft Edge...");
+  log(`Abriendo Edge -> ${APP_LOCAL_URL}`);
   if (isWin) {
-    spawn("cmd", ["/c", "start", "msedge", "http://localhost:3000"], {
+    spawn("cmd", ["/c", "start", "msedge", APP_LOCAL_URL], {
       detached: true,
       stdio: "ignore",
     }).unref();
@@ -177,7 +192,8 @@ async function openBrowser() {
 
 async function main() {
   console.log("========================================");
-  console.log("  CursosVentas + SQL Server Express");
+  console.log("  CursosVentas + SQL Server");
+  console.log(`  Puerto ${PORT}  |  ${APP_LOCAL_URL}`);
   console.log("  LARA-NB\\SQLEXPRESS02 / Cursosventas");
   console.log("========================================");
 
@@ -189,21 +205,28 @@ async function main() {
 
   const databaseUrl = readDatabaseUrl();
 
-  log("Iniciando http://localhost:3000");
+  log(`Iniciando servidor en ${APP_LOCAL_URL}`);
   console.log("Admin: admin@academia.local / Admin123!");
-  console.log("Dejá esta ventana ABIERTA.\n");
+  console.log("NO CIERRES esta ventana.\n");
 
   openBrowser();
 
-  const child = spawn("npx", ["next", "dev", "-p", "3000"], {
-    cwd: root,
-    stdio: "inherit",
-    shell: true,
-    env: {
-      ...process.env,
-      DATABASE_URL: databaseUrl,
+  const child = spawn(
+    "npx",
+    ["next", "dev", "-H", "127.0.0.1", "-p", String(PORT)],
+    {
+      cwd: root,
+      stdio: "inherit",
+      shell: true,
+      env: {
+        ...process.env,
+        DATABASE_URL: databaseUrl,
+        PORT: String(PORT),
+        NEXTAUTH_URL: APP_LOCAL_URL,
+        APP_URL: APP_LOCAL_URL,
+      },
     },
-  });
+  );
 
   child.on("exit", (code) => process.exit(code ?? 0));
 }
