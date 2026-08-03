@@ -3,10 +3,9 @@ generator client {
 }
 
 datasource db {
-  // Local rápido: "sqlite"
-  // SQL Server Express (LARA-NB\SQLEXPRESS02): "sqlserver"
-  // DonWeb: "mysql"
-  provider = "sqlite"
+  // SQL Server Express local: LARA-NB\SQLEXPRESS02 / Cursosventas
+  // DonWeb MySQL: cambiar a provider = "mysql"
+  provider = "sqlserver"
   url      = env("DATABASE_URL")
 }
 
@@ -31,44 +30,44 @@ enum PaymentStatus {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  passwordHash  String
-  name          String
-  role          Role           @default(STUDENT)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  enrollments   Enrollment[]
+  id             String           @id @default(cuid())
+  email          String           @unique @db.NVarChar(191)
+  passwordHash   String           @db.NVarChar(191)
+  name           String           @db.NVarChar(191)
+  role           Role             @default(STUDENT)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  enrollments    Enrollment[]
   lessonProgress LessonProgress[]
-  examAttempts  ExamAttempt[]
-  certificates  Certificate[]
-  payments      Payment[]
+  examAttempts   ExamAttempt[]
+  certificates   Certificate[]
+  payments       Payment[]
 }
 
 model Course {
-  id              String       @id @default(cuid())
-  slug            String       @unique
-  title           String
-  shortDescription String
-  description     String
-  price           Float
-  currency        String       @default("ARS")
-  thumbnailPath   String?
-  published       Boolean      @default(false)
-  passingScore    Int          @default(70)
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  modules         Module[]
-  enrollments     Enrollment[]
-  exam            Exam?
-  certificates    Certificate[]
-  payments        Payment[]
+  id               String         @id @default(cuid())
+  slug             String         @unique @db.NVarChar(191)
+  title            String         @db.NVarChar(191)
+  shortDescription String         @db.NVarChar(1000)
+  description      String         @db.NVarChar(Max)
+  price            Float
+  currency         String         @default("ARS") @db.NVarChar(10)
+  thumbnailPath    String?        @db.NVarChar(1000)
+  published        Boolean        @default(false)
+  passingScore     Int            @default(70)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  modules          Module[]
+  enrollments      Enrollment[]
+  exam             Exam?
+  certificates     Certificate[]
+  payments         Payment[]
 }
 
 model Module {
   id        String   @id @default(cuid())
   courseId  String
-  title     String
+  title     String   @db.NVarChar(191)
   sortOrder Int      @default(0)
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessons   Lesson[]
@@ -77,16 +76,16 @@ model Module {
 }
 
 model Lesson {
-  id           String           @id @default(cuid())
-  moduleId     String
-  title        String
-  description  String?
-  sortOrder    Int              @default(0)
-  durationSec  Int              @default(0)
-  videoPath    String?
-  videoMime    String?
-  module       Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  progress     LessonProgress[]
+  id          String           @id @default(cuid())
+  moduleId    String
+  title       String           @db.NVarChar(191)
+  description String?          @db.NVarChar(Max)
+  sortOrder   Int              @default(0)
+  durationSec Int              @default(0)
+  videoPath   String?          @db.NVarChar(1000)
+  videoMime   String?          @db.NVarChar(100)
+  module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress    LessonProgress[]
 
   @@index([moduleId])
 }
@@ -99,8 +98,8 @@ model Enrollment {
   purchasedAt DateTime?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course      Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user        User             @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  course      Course           @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   payments    Payment[]
 
   @@unique([userId, courseId])
@@ -108,22 +107,22 @@ model Enrollment {
 }
 
 model Payment {
-  id                String        @id @default(cuid())
-  userId            String
-  courseId          String
-  enrollmentId      String?
-  amount            Float
-  currency          String        @default("ARS")
-  status            PaymentStatus @default(PENDING)
-  mpPreferenceId    String?
-  mpPaymentId       String?
-  mpExternalReference String?     @unique
-  rawPayload        String?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course            Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  enrollment        Enrollment?   @relation(fields: [enrollmentId], references: [id])
+  id                  String        @id @default(cuid())
+  userId              String
+  courseId            String
+  enrollmentId        String?
+  amount              Float
+  currency            String        @default("ARS") @db.NVarChar(10)
+  status              PaymentStatus @default(PENDING)
+  mpPreferenceId      String?       @db.NVarChar(191)
+  mpPaymentId         String?       @db.NVarChar(191)
+  mpExternalReference String?       @unique @db.NVarChar(191)
+  rawPayload          String?       @db.NVarChar(Max)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  user                User          @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  course              Course        @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  enrollment          Enrollment?   @relation(fields: [enrollmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([userId])
   @@index([courseId])
@@ -137,7 +136,7 @@ model LessonProgress {
   completed   Boolean   @default(false)
   completedAt DateTime?
   updatedAt   DateTime  @updatedAt
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
@@ -146,21 +145,21 @@ model LessonProgress {
 model Exam {
   id          String         @id @default(cuid())
   courseId    String         @unique
-  title       String
-  description String?
+  title       String         @db.NVarChar(191)
+  description String?        @db.NVarChar(Max)
   course      Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
   questions   ExamQuestion[]
   attempts    ExamAttempt[]
 }
 
 model ExamQuestion {
-  id            String       @id @default(cuid())
+  id            String @id @default(cuid())
   examId        String
-  prompt        String
-  sortOrder     Int          @default(0)
-  optionsJson   String
+  prompt        String @db.NVarChar(Max)
+  sortOrder     Int    @default(0)
+  optionsJson   String @db.NVarChar(Max)
   correctOption Int
-  exam          Exam         @relation(fields: [examId], references: [id], onDelete: Cascade)
+  exam          Exam   @relation(fields: [examId], references: [id], onDelete: Cascade)
 
   @@index([examId])
 }
@@ -171,26 +170,26 @@ model ExamAttempt {
   examId      String
   score       Int
   passed      Boolean
-  answersJson String
+  answersJson String   @db.NVarChar(Max)
   createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   exam        Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
 
   @@index([userId, examId])
 }
 
 model Certificate {
-  id              String   @id @default(cuid())
-  code            String   @unique
-  userId          String
-  courseId        String
-  issuedAt        DateTime @default(now())
-  pdfPath         String?
-  studentName     String
-  courseTitle     String
-  score           Int
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course          Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  code        String   @unique @db.NVarChar(191)
+  userId      String
+  courseId    String
+  issuedAt    DateTime @default(now())
+  pdfPath     String?  @db.NVarChar(1000)
+  studentName String   @db.NVarChar(191)
+  courseTitle String   @db.NVarChar(191)
+  score       Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([userId, courseId])
 }

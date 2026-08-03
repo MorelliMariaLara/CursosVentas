@@ -1,11 +1,7 @@
 /**
- * Arranque local a prueba de balas (Windows / Mac / Linux).
- * - Crea .env si falta
- * - Fuerza SQLite local (file:./dev.db) para que siempre arranque
- * - npm install si no hay node_modules
- * - prisma generate + db push + seed
- * - next dev
- * - en Windows abre Edge
+ * Arranque local con SQL Server Express.
+ * Servidor: LARA-NB\SQLEXPRESS02
+ * Base:     Cursosventas
  */
 const fs = require("fs");
 const path = require("path");
@@ -15,11 +11,14 @@ const http = require("http");
 const root = process.cwd();
 const isWin = process.platform === "win32";
 
+const DEFAULT_SQLSERVER_URL =
+  'sqlserver://LARA-NB\\SQLEXPRESS02;database=Cursosventas;integratedSecurity=true;trustServerCertificate=true';
+
 function log(msg) {
   console.log(`\n==> ${msg}`);
 }
 
-function fail(msg, code = 1) {
+function fail(msg) {
   console.error(`\nERROR: ${msg}`);
   if (isWin) {
     console.log("\nPresioná una tecla para cerrar...");
@@ -29,7 +28,7 @@ function fail(msg, code = 1) {
       /* ignore */
     }
   }
-  process.exit(code);
+  process.exit(1);
 }
 
 function run(command, args, opts = {}) {
@@ -40,7 +39,7 @@ function run(command, args, opts = {}) {
     env: { ...process.env, ...opts.env },
   });
   if (result.status !== 0) {
-    fail(`Falló: ${command} ${args.join(" ")}`);
+    fail(`Falló: ${command} ${args.join(" ")}\nRevisá que SQL Server esté corriendo y la base Cursosventas exista.`);
   }
 }
 
@@ -63,35 +62,23 @@ function ensureEnv() {
       fs.copyFileSync(examplePath, envPath);
       log("Se creó .env desde .env.example");
     } else {
-      fs.writeFileSync(
-        envPath,
-        [
-          'DATABASE_URL="file:./dev.db"',
-          'AUTH_SECRET="dev-secret-change-me-in-production-32chars"',
-          'NEXTAUTH_URL="http://localhost:3000"',
-          'APP_NAME="Academia Certifica"',
-          'APP_URL="http://localhost:3000"',
-          'UPLOAD_DIR="./uploads"',
-          'ADMIN_EMAIL="admin@academia.local"',
-          'ADMIN_PASSWORD="Admin123!"',
-          'ADMIN_NAME="Administrador"',
-          "",
-        ].join("\n"),
-      );
-      log("Se creó .env mínimo");
+      fail("No existe .env ni .env.example");
     }
   }
 
-  // Forzar SQLite local para arranque garantizado
   let content = fs.readFileSync(envPath, "utf8");
-  if (/^DATABASE_URL=.*/m.test(content)) {
-    content = content.replace(
-      /^DATABASE_URL=.*/m,
-      'DATABASE_URL="file:./dev.db"',
-    );
-  } else {
-    content = `DATABASE_URL="file:./dev.db"\n` + content;
+
+  // Si todavía tiene SQLite, o no tiene DATABASE_URL, poner SQL Server
+  const current = content.match(/^DATABASE_URL=(.*)$/m);
+  const value = current ? current[1] : "";
+  const isSqlite = value.includes("file:") || value.includes("dev.db");
+  if (!current || isSqlite || value.trim() === '""' || value.trim() === "") {
+    content = content.replace(/^DATABASE_URL=.*$/m, "");
+    content =
+      `DATABASE_URL="${DEFAULT_SQLSERVER_URL}"\n` + content.trim() + "\n";
+    log("DATABASE_URL configurado a SQL Server (Cursosventas)");
   }
+
   if (!/^AUTH_SECRET=/m.test(content)) {
     content +=
       '\nAUTH_SECRET="dev-secret-change-me-in-production-32chars"\n';
@@ -102,8 +89,19 @@ function ensureEnv() {
   if (!/^APP_URL=/m.test(content)) {
     content += '\nAPP_URL="http://localhost:3000"\n';
   }
+
   fs.writeFileSync(envPath, content);
-  log('DATABASE_URL local = file:./dev.db (SQLite)');
+
+  const urlLine = content.match(/^DATABASE_URL=(.*)$/m);
+  console.log(`Usando ${urlLine ? urlLine[1] : "(sin URL)"}`);
+}
+
+function readDatabaseUrl() {
+  const envPath = path.join(root, ".env");
+  const content = fs.readFileSync(envPath, "utf8");
+  const m = content.match(/^DATABASE_URL="?(.*?)"?\s*$/m);
+  if (!m) fail("No se encontró DATABASE_URL en .env");
+  return m[1];
 }
 
 function ensureUploads() {
@@ -122,19 +120,25 @@ function ensureDeps() {
     log("Instalando dependencias (npm install)...");
     run("npm", ["install"]);
   } else {
-    log("Dependencias OK (node_modules existe)");
+    log("Dependencias OK");
   }
 }
 
 function ensureDatabase() {
-  const env = {
-    DATABASE_URL: "file:./dev.db",
-  };
-  log("Generando Prisma Client...");
+  const databaseUrl = readDatabaseUrl();
+  const env = { DATABASE_URL: databaseUrl };
+
+  log("Generando Prisma Client (SQL Server)...");
   run("npx", ["prisma", "generate"], { env });
-  log("Creando / actualizando tablas SQLite...");
+
+  log("Sincronizando tablas en SQL Server (prisma db push)...");
+  console.log(
+    "Si falla la conexión: habilitá TCP/IP en SQL Server Configuration Manager",
+  );
+  console.log("y asegurate de que exista la base Cursosventas.\n");
   run("npx", ["prisma", "db", "push", "--accept-data-loss"], { env });
-  log("Cargando admin + curso demo...");
+
+  log("Seed admin + curso demo...");
   run("npx", ["tsx", "prisma/seed.ts"], { env });
 }
 
@@ -159,21 +163,12 @@ function waitForServer(url, attempts = 40) {
 async function openBrowser() {
   const ok = await waitForServer("http://localhost:3000");
   if (!ok) {
-    console.warn(
-      "El servidor tarda en responder. Abrí manualmente http://localhost:3000",
-    );
+    console.warn("Abrí manualmente http://localhost:3000");
     return;
   }
-  log("Abriendo navegador...");
+  log("Abriendo Microsoft Edge...");
   if (isWin) {
     spawn("cmd", ["/c", "start", "msedge", "http://localhost:3000"], {
-      detached: true,
-      stdio: "ignore",
-      shell: false,
-    }).unref();
-  } else {
-    const opener = process.platform === "darwin" ? "open" : "xdg-open";
-    spawn(opener, ["http://localhost:3000"], {
       detached: true,
       stdio: "ignore",
     }).unref();
@@ -182,7 +177,8 @@ async function openBrowser() {
 
 async function main() {
   console.log("========================================");
-  console.log("  Academia / CursosVentas — arranque");
+  console.log("  CursosVentas + SQL Server Express");
+  console.log("  LARA-NB\\SQLEXPRESS02 / Cursosventas");
   console.log("========================================");
 
   ensureNode();
@@ -191,11 +187,12 @@ async function main() {
   ensureDeps();
   ensureDatabase();
 
-  log("Iniciando servidor en http://localhost:3000");
-  console.log("Admin: admin@academia.local / Admin123!");
-  console.log("Dejá esta ventana ABIERTA mientras usás la app.\n");
+  const databaseUrl = readDatabaseUrl();
 
-  // Abrir browser en paralelo cuando el server responda
+  log("Iniciando http://localhost:3000");
+  console.log("Admin: admin@academia.local / Admin123!");
+  console.log("Dejá esta ventana ABIERTA.\n");
+
   openBrowser();
 
   const child = spawn("npx", ["next", "dev", "-p", "3000"], {
@@ -204,16 +201,11 @@ async function main() {
     shell: true,
     env: {
       ...process.env,
-      DATABASE_URL: "file:./dev.db",
+      DATABASE_URL: databaseUrl,
     },
   });
 
-  child.on("exit", (code) => {
-    process.exit(code ?? 0);
-  });
+  child.on("exit", (code) => process.exit(code ?? 0));
 }
 
-main().catch((err) => {
-  console.error(err);
-  fail(String(err && err.message ? err.message : err));
-});
+main().catch((err) => fail(String(err && err.message ? err.message : err)));
