@@ -1,29 +1,46 @@
-# Academia Certifica
+# Academia Certifica — CursosVentas
 
-## Ver las interfaces YA (Windows)
+Plataforma de cursos en video + Mercado Pago + certificados.  
+Local: **SQL Server Express** `LARA-NB\SQLEXPRESS02` / base `Cursosventas`  
+App: **http://localhost:8080**
 
-1. Instalá Node.js LTS: https://nodejs.org/ → reiniciá la PC  
-2. En la carpeta del proyecto, **doble clic** en:
+## Arrancar en Windows
 
-### `start-local.bat`
+1. Node.js LTS: https://nodejs.org/ (reiniciá la PC)
+2. En SSMS, creá la base si no existe:
 
-3. Esperá hasta que diga servidor OK / localhost:3000  
-4. Se abre el navegador solo. Si no:
+```sql
+IF DB_ID(N'Cursosventas') IS NULL CREATE DATABASE Cursosventas;
+```
+
+3. En PowerShell:
 
 ```powershell
-.\abrir-edge.bat
+cd "C:\Users\Maria Lara\source\repos\CursosVentas"
+git pull origin main
+copy /Y .env.example .env
+.\start-local.bat
 ```
+
+4. Cuando diga listo, abrí **http://localhost:8080** (Edge se abre solo).
 
 ```
 Admin: admin@academia.local
 Clave:  Admin123!
 ```
 
-**Importante:** no cierres la ventana negra. Si la cerrás, Edge muestra `ERR_CONNECTION_REFUSED`.
+**No cierres la ventana negra.** Si la cerrás → `ERR_CONNECTION_REFUSED`.
 
-Si falla, abrí el archivo `start-local.log` y copiá el contenido.
+### Si no conecta a SQL Server
 
-## SQL Server
+En `.env`:
 
-La UI local usa SQLite para que siempre arranque.  
-SQL Server (`LARA-NB\SQLEXPRESS02` / `Cursosventas`) se conecta después; scripts en `sql/sqlserver/`.
+```env
+DATABASE_URL="sqlserver://localhost\\SQLEXPRESS02;database=Cursosventas;integratedSecurity=true;trustServerCertificate=true"
+```
+
+Y habilitá TCP/IP en SQL Server Configuration Manager para `SQLEXPRESS02`.
+
+## Puerto
+
+Usa **8080** (no 3000) para evitar conflictos.
