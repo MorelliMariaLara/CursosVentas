@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <PackageJsonName Condition="$(PackageJsonName) == ''">cursos-ventas</PackageJsonName>
+    <PackageJsonVersion Condition="$(PackageJsonVersion) == ''">0.1.0</PackageJsonVersion>
+    <PackageJsonPrivate Condition="$(PackageJsonPrivate) == ''">true</PackageJsonPrivate>
+    <PackageJsonScriptsDev Condition="$(PackageJsonScriptsDev) == ''">next dev</PackageJsonScriptsDev>
+    <PackageJsonScriptsBuild Condition="$(PackageJsonScriptsBuild) == ''">prisma generate &amp;&amp; next build</PackageJsonScriptsBuild>
+    <PackageJsonScriptsStart Condition="$(PackageJsonScriptsStart) == ''">next start</PackageJsonScriptsStart>
+    <PackageJsonScriptsLint Condition="$(PackageJsonScriptsLint) == ''">eslint</PackageJsonScriptsLint>
+    <PackageJsonScriptsDbPush Condition="$(PackageJsonScriptsDbPush) == ''">prisma db push</PackageJsonScriptsDbPush>
+    <PackageJsonScriptsDbSeed Condition="$(PackageJsonScriptsDbSeed) == ''">tsx prisma/seed.ts</PackageJsonScriptsDbSeed>
+    <PackageJsonScriptsDbSetup Condition="$(PackageJsonScriptsDbSetup) == ''">prisma db push &amp;&amp; tsx prisma/seed.ts</PackageJsonScriptsDbSetup>
+    <PackageJsonScriptsPostinstall Condition="$(PackageJsonScriptsPostinstall) == ''">node scripts/postinstall.js</PackageJsonScriptsPostinstall>
+    <PackageJsonPrismaSeed Condition="$(PackageJsonPrismaSeed) == ''">tsx prisma/seed.ts</PackageJsonPrismaSeed>
+    <PackageJsonDependenciesPrismaClient Condition="$(PackageJsonDependenciesPrismaClient) == ''">^6.19.3</PackageJsonDependenciesPrismaClient>
+    <PackageJsonDependenciesBcryptjs Condition="$(PackageJsonDependenciesBcryptjs) == ''">^3.0.3</PackageJsonDependenciesBcryptjs>
+    <PackageJsonDependenciesDateFns Condition="$(PackageJsonDependenciesDateFns) == ''">^4.4.0</PackageJsonDependenciesDateFns>
+    <PackageJsonDependenciesDotenv Condition="$(PackageJsonDependenciesDotenv) == ''">^17.4.2</PackageJsonDependenciesDotenv>
+    <PackageJsonDependenciesJose Condition="$(PackageJsonDependenciesJose) == ''">^6.2.8</PackageJsonDependenciesJose>
+    <PackageJsonDependenciesMercadopago Condition="$(PackageJsonDependenciesMercadopago) == ''">^3.2.1</PackageJsonDependenciesMercadopago>
+    <PackageJsonDependenciesNext Condition="$(PackageJsonDependenciesNext) == ''">16.2.12</PackageJsonDependenciesNext>
+    <PackageJsonDependenciesNextAuth Condition="$(PackageJsonDependenciesNextAuth) == ''">^5.0.0-beta.32</PackageJsonDependenciesNextAuth>
+    <PackageJsonDependenciesPdfkit Condition="$(PackageJsonDependenciesPdfkit) == ''">^0.19.1</PackageJsonDependenciesPdfkit>
+    <PackageJsonDependenciesReact Condition="$(PackageJsonDependenciesReact) == ''">19.2.4</PackageJsonDependenciesReact>
+    <PackageJsonDependenciesReactDom Condition="$(PackageJsonDependenciesReactDom) == ''">19.2.4</PackageJsonDependenciesReactDom>
+    <PackageJsonDependenciesSharp Condition="$(PackageJsonDependenciesSharp) == ''">^0.35.3</PackageJsonDependenciesSharp>
+    <PackageJsonDependenciesUuid Condition="$(PackageJsonDependenciesUuid) == ''">^14.0.1</PackageJsonDependenciesUuid>
+    <PackageJsonDependenciesZod Condition="$(PackageJsonDependenciesZod) == ''">^4.4.3</PackageJsonDependenciesZod>
+    <PackageJsonDevdependenciesTailwindcssPostcss Condition="$(PackageJsonDevdependenciesTailwindcssPostcss) == ''">^4</PackageJsonDevdependenciesTailwindcssPostcss>
+    <PackageJsonDevdependenciesTypesBcryptjs Condition="$(PackageJsonDevdependenciesTypesBcryptjs) == ''">^2.4.6</PackageJsonDevdependenciesTypesBcryptjs>
+    <PackageJsonDevdependenciesTypesNode Condition="$(PackageJsonDevdependenciesTypesNode) == ''">^20</PackageJsonDevdependenciesTypesNode>
+    <PackageJsonDevdependenciesTypesPdfkit Condition="$(PackageJsonDevdependenciesTypesPdfkit) == ''">^0.17.6</PackageJsonDevdependenciesTypesPdfkit>
+    <PackageJsonDevdependenciesTypesReact Condition="$(PackageJsonDevdependenciesTypesReact) == ''">^19</PackageJsonDevdependenciesTypesReact>
+    <PackageJsonDevdependenciesTypesReactDom Condition="$(PackageJsonDevdependenciesTypesReactDom) == ''">^19</PackageJsonDevdependenciesTypesReactDom>
+    <PackageJsonDevdependenciesTypesUuid Condition="$(PackageJsonDevdependenciesTypesUuid) == ''">^10.0.0</PackageJsonDevdependenciesTypesUuid>
+    <PackageJsonDevdependenciesEslint Condition="$(PackageJsonDevdependenciesEslint) == ''">^9</PackageJsonDevdependenciesEslint>
+    <PackageJsonDevdependenciesEslintConfigNext Condition="$(PackageJsonDevdependenciesEslintConfigNext) == ''">16.2.12</PackageJsonDevdependenciesEslintConfigNext>
+    <PackageJsonDevdependenciesPrisma Condition="$(PackageJsonDevdependenciesPrisma) == ''">^6.19.3</PackageJsonDevdependenciesPrisma>
+    <PackageJsonDevdependenciesTailwindcss Condition="$(PackageJsonDevdependenciesTailwindcss) == ''">^4</PackageJsonDevdependenciesTailwindcss>
+    <PackageJsonDevdependenciesTsx Condition="$(PackageJsonDevdependenciesTsx) == ''">^4.23.5</PackageJsonDevdependenciesTsx>
+    <PackageJsonDevdependenciesTypescript Condition="$(PackageJsonDevdependenciesTypescript) == ''">^5</PackageJsonDevdependenciesTypescript>
+  </PropertyGroup>
+</Project>
