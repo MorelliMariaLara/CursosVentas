@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "CursosVentas.Launcher": {
+      "commandName": "Project",
+      "workingDirectory": "$(ProjectDir)..",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "PORT": "8080",
+        "NEXTAUTH_URL": "http://localhost:8080",
+        "APP_URL": "http://localhost:8080"
+      }
+    }
+  }
+}

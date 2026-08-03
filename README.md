@@ -1,35 +1,32 @@
 # Academia Certifica — Sitio web de cursos
 
-Aplicación **web** para vender cursos en video, pagar con Mercado Pago,
-rendir examen y emitir certificados.
+## Ejecutar desde Visual Studio (.sln)
 
-## Cómo verlo (Windows)
-
-1. Instalá **Node.js 20 LTS** (importante: no uses Node 24): https://nodejs.org/
-2. Reiniciá la PC.
-3. En la carpeta del proyecto, **doble clic** en `ABRIR.bat`
-4. Se abre **http://localhost:8080**
+1. Instalá **Node.js 20 LTS**: https://nodejs.org/ (reiniciá la PC)
+2. Abrí **`CursosVentas.sln`**
+3. En el Explorador de soluciones, clic derecho en **`CursosVentas.Launcher`** → **Establecer como proyecto de inicio**
+4. Pulsá **F5** (o el botón verde ▶)
+5. Se abre la web en **http://localhost:8080**
 
 ```
 Admin: admin@academia.local
 Clave:  Admin123!
 ```
 
-Si falló antes: borrá la carpeta `node_modules` y volvé a ejecutar `ABRIR.bat`.
+Dejá la ventana de consola abierta.
 
-## Qué incluye el sitio
+### Proyectos en la solución
 
-- `/` — Inicio
-- `/cursos` — Catálogo
-- `/cursos/[slug]` — Detalle y compra
-- `/login` `/registro` — Acceso
-- `/mis-cursos` — Aula del alumno
-- `/aprender/[slug]` — Videos protegidos
-- `/admin` — Panel para subir cursos/videos/exámenes
-- `/verificar` — Validar certificados
+| Proyecto | Para qué |
+|---|---|
+| **CursosVentas.Launcher** | **Proyecto de inicio** — ejecuta el sitio web |
+| **CursosVentas.Web** | Archivos del sitio (páginas, API, etc.) — no se ejecuta solo |
 
-## SQL Server / DonWeb
+## Alternativa sin Visual Studio
 
-- Local ya funciona con SQLite (incluido en `ABRIR.bat`).
-- SQL Server: ver `prisma/schema.sqlserver.prisma` y `sql/sqlserver/`.
-- DonWeb MySQL: cambiar `provider` a `mysql` y el `DATABASE_URL`.
+Doble clic en `ABRIR.bat`
+
+## Requisitos
+
+- Node.js **20 LTS** (evitar Node 24 en Windows)
+- Visual Studio 2022 con workload de desarrollo .NET (para el Launcher)

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.2191419">
+  <!--
+    Proyecto WEB (archivos del sitio).
+    NO es el de inicio. El de inicio es CursosVentas.Launcher.
+  -->
+  <PropertyGroup>
+    <ShouldRunNpmInstall>false</ShouldRunNpmInstall>
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <BuildCommand></BuildCommand>
+    <CleanCommand></CleanCommand>
+  </PropertyGroup>
+</Project>

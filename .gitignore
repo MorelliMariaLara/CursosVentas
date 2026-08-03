@@ -31,6 +31,8 @@
 obj/
 bin/
 packages/
+launcher/bin/
+launcher/obj/
 
 # debug
 npm-debug.log*

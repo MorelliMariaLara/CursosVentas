@@ -1,0 +1,9 @@
+# Visual Studio / build
+.vs/
+launcher/bin/
+launcher/obj/
+*.user
+*.suo
+obj/
+bin/
+packages/
