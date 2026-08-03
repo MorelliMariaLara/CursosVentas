@@ -3,30 +3,9 @@ generator client {
 }
 
 datasource db {
-  // SQL Server Express local: LARA-NB\SQLEXPRESS02 / Cursosventas
-  // DonWeb MySQL: cambiar a provider = "mysql"
+  // SQL Server Express: LARA-NB\SQLEXPRESS02 / Cursosventas
   provider = "sqlserver"
   url      = env("DATABASE_URL")
-}
-
-enum Role {
-  STUDENT
-  ADMIN
-}
-
-enum EnrollmentStatus {
-  PENDING
-  ACTIVE
-  REFUNDED
-  CANCELLED
-}
-
-enum PaymentStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  REFUNDED
-  CANCELLED
 }
 
 model User {
@@ -34,7 +13,7 @@ model User {
   email          String           @unique @db.NVarChar(191)
   passwordHash   String           @db.NVarChar(191)
   name           String           @db.NVarChar(191)
-  role           Role             @default(STUDENT)
+  role           String           @default("STUDENT") @db.NVarChar(50)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   enrollments    Enrollment[]
@@ -91,15 +70,15 @@ model Lesson {
 }
 
 model Enrollment {
-  id          String           @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
   courseId    String
-  status      EnrollmentStatus @default(PENDING)
+  status      String    @default("PENDING") @db.NVarChar(50)
   purchasedAt DateTime?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  user        User             @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  course      Course           @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   payments    Payment[]
 
   @@unique([userId, courseId])
@@ -107,22 +86,22 @@ model Enrollment {
 }
 
 model Payment {
-  id                  String        @id @default(cuid())
+  id                  String      @id @default(cuid())
   userId              String
   courseId            String
   enrollmentId        String?
   amount              Float
-  currency            String        @default("ARS") @db.NVarChar(10)
-  status              PaymentStatus @default(PENDING)
-  mpPreferenceId      String?       @db.NVarChar(191)
-  mpPaymentId         String?       @db.NVarChar(191)
-  mpExternalReference String?       @unique @db.NVarChar(191)
-  rawPayload          String?       @db.NVarChar(Max)
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
-  user                User          @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  course              Course        @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  enrollment          Enrollment?   @relation(fields: [enrollmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  currency            String      @default("ARS") @db.NVarChar(10)
+  status              String      @default("PENDING") @db.NVarChar(50)
+  mpPreferenceId      String?     @db.NVarChar(191)
+  mpPaymentId         String?     @db.NVarChar(191)
+  mpExternalReference String?     @unique @db.NVarChar(191)
+  rawPayload          String?     @db.NVarChar(Max)
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  user                User        @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  course              Course      @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  enrollment          Enrollment? @relation(fields: [enrollmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([userId])
   @@index([courseId])

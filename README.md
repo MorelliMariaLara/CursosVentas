@@ -2,177 +2,66 @@
 
 Aplicación web para **vender cursos en video**, cobrar con **Mercado Pago Checkout Pro**, proteger el contenido, evaluar al alumno y emitir **certificados digitales**.
 
-Compatible con hosting + MySQL de **DonWeb** (o cualquier MySQL) y dominio propio.
-
-## Qué incluye
-
-- Catálogo público de cursos
-- Registro / login de alumnos y panel de administrador
-- Compra con **Checkout Pro** (Mercado Pago) + webhook de confirmación
-- Modo demo sin MP: activa el curso para poder probar el flujo
-- Subida de videos desde el admin
-- Reproductor protegido (token temporal, sin descarga, anti clic derecho, pausa al cambiar de ventana, marca de agua)
-- Seguimiento de progreso por clase
-- Examen final configurable
-- Certificado PDF + verificación pública por código (`/verificar`)
-
-> **Importante sobre privacidad de video:** ninguna web puede impedir al 100% la captura de pantalla del sistema operativo. La plataforma aplica barreras prácticas (streaming firmado, sin URL permanente, controles de descarga deshabilitados, watermark, bloqueo de atajos comunes). Para DRM de nivel estudio (Widevine/FairPlay) se puede integrar luego un proveedor como Mux, Vimeo OTT o AWS.
-
 ## Stack
 
 - Next.js 16 (App Router) + TypeScript
-- Prisma + SQLite (dev) / MySQL (producción DonWeb)
+- Prisma + **SQL Server Express** (local: `LARA-NB\SQLEXPRESS02` / `Cursosventas`)
 - Auth.js (NextAuth) credentials
 - Mercado Pago SDK (Checkout Pro)
 - PDFKit para certificados
 
-## Inicio rápido (local) — Windows
+## Inicio rápido — Windows + SQL Server
 
-1. Instalá **Node.js LTS**: https://nodejs.org/ (después reiniciá la PC).
-2. En la carpeta del proyecto, doble clic en:
+**Requisitos**
+1. Node.js LTS: https://nodejs.org/ (reiniciá la PC después)
+2. SQL Server Express corriendo: `LARA-NB\SQLEXPRESS02`
+3. Base creada: `Cursosventas`
 
-### **`start-local.bat`**
+En SSMS (una sola vez):
 
-Eso hace TODO solo:
-- crea `.env`
-- `npm install` si hace falta
-- crea la base SQLite + admin + curso demo
+```sql
+IF DB_ID(N'Cursosventas') IS NULL CREATE DATABASE Cursosventas;
+```
+
+**Arrancar la app**
+
+```powershell
+cd "C:\Users\Maria Lara\source\repos\CursosVentas"
+git pull origin main
+
+# Actualizá .env a SQL Server (importante si antes usabas SQLite)
+copy /Y .env.example .env
+
+.\start-local.bat
+```
+
+Eso:
+- conecta a SQL Server
+- crea/sincroniza tablas
+- carga admin + curso demo
 - levanta http://localhost:3000
-- abre Microsoft Edge
-
-**Dejá la ventana negra abierta.** Si la cerrás, el sitio se cae.
+- abre Edge
 
 ```
 Admin: admin@academia.local
-Clave: Admin123!
+Clave:  Admin123!
 ```
 
-> SQL Server (`Cursosventas`) es opcional y se conecta después. Para arrancar YA usamos SQLite.
+**Dejá la ventana negra abierta.**
 
-### Alternativa por terminal
+### Si no conecta a SQL Server
 
-```powershell
-git pull origin main
-npm run local
-```
-
-> Visual Studio: **Compilar no inicia la web**. Usá `start-local.bat`.
-
-## Configurar Mercado Pago
-
-1. Creá una aplicación en [developers.mercadopago.com](https://www.mercadopago.com.ar/developers/panel)
-2. Copiá el **Access Token** (test o producción) a `.env`:
+1. SQL Server Configuration Manager → habilitar **TCP/IP** en `SQLEXPRESS02` → reiniciar servicio
+2. En `.env` probá:
 
 ```env
-MP_ACCESS_TOKEN=APP_USR-...
-MP_PUBLIC_KEY=APP_USR-...
-APP_URL=https://tudominio.com
-NEXTAUTH_URL=https://tudominio.com
+DATABASE_URL="sqlserver://localhost\\SQLEXPRESS02;database=Cursosventas;integratedSecurity=true;trustServerCertificate=true"
 ```
 
-3. El webhook apunta a: `https://tudominio.com/api/webhooks/mercadopago`
-4. En el panel de MP, configurá esa URL de notificaciones.
+## Mercado Pago
 
-Sin `MP_ACCESS_TOKEN`, el botón de compra activa el curso en **modo demo** para que puedas probar el resto del flujo.
+Sin `MP_ACCESS_TOKEN` la compra funciona en **modo demo** (activa el curso directo).
 
-## Base de datos en DonWeb (MySQL)
+## DonWeb (MySQL) más adelante
 
-1. En el panel de DonWeb, creá una base MySQL y un usuario.
-2. En `prisma/schema.prisma` cambiá:
-
-```prisma
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
-```
-
-3. En `.env` de producción:
-
-```env
-DATABASE_URL="mysql://USUARIO:PASSWORD@HOST:3306/NOMBRE_BD"
-```
-
-- Si la app corre **en el mismo hosting** que MySQL: el host suele ser `localhost`.
-- Si la app corre **afuera** (VPS/Vercel/Railway): usá el host remoto que te dé DonWeb y habilitá acceso remoto al MySQL si el plan lo permite.
-
-4. Aplicá el schema:
-
-```bash
-npx prisma db push
-npm run db:seed
-```
-
-## Despliegue con dominio
-
-### Opción A — VPS / Node en DonWeb Cloud
-
-1. Subí el código (git clone / deploy).
-2. Configurá `.env` con MySQL, `AUTH_SECRET`, dominio y Mercado Pago.
-3. Build y arranque:
-
-```bash
-npm install
-npm run db:setup
-npm run build
-npm run start
-```
-
-4. Poné Nginx/Apache como reverse proxy al puerto 3000 y apuntá el dominio.
-
-### Opción B — App en Vercel + MySQL DonWeb
-
-1. Conectá el repo a Vercel.
-2. Cargá las variables de entorno (incluido `DATABASE_URL` remoto).
-3. Asegurate de que DonWeb permita conexiones remotas al MySQL (o usá un túnel).
-4. Los videos: en Vercel el filesystem es efímero. Para producción real de videos grandes, guardalos en **storage externo** (S3, R2, o disco del VPS). El código actual guarda en `UPLOAD_DIR` (ideal para VPS).
-
-### Variables mínimas de producción
-
-| Variable | Descripción |
-|---|---|
-| `DATABASE_URL` | MySQL DonWeb |
-| `AUTH_SECRET` | `openssl rand -base64 32` |
-| `NEXTAUTH_URL` / `APP_URL` | `https://tudominio.com` |
-| `MP_ACCESS_TOKEN` | Token Checkout Pro |
-| `UPLOAD_DIR` | Ruta absoluta writable, ej. `/var/www/academia/uploads` |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Solo para el seed inicial |
-
-## Flujo del alumno
-
-1. Se registra e inicia sesión
-2. Compra un curso → Mercado Pago
-3. El webhook marca la inscripción como `ACTIVE`
-4. Ve las clases en streaming protegido
-5. Al completar el 100%, rinde el examen
-6. Si aprueba (≥ `passingScore`), descarga el certificado PDF
-
-## Flujo del admin
-
-1. Login como admin → `/admin`
-2. Crear curso, módulos y clases
-3. Subir videos MP4/WebM/MOV
-4. Crear examen y preguntas
-5. Publicar el curso
-
-## Scripts útiles
-
-```bash
-npm run dev          # desarrollo
-npm run build        # build producción
-npm run db:push      # sincronizar schema
-npm run db:seed      # admin + curso demo
-npm run db:setup     # push + seed
-```
-
-## Estructura relevante
-
-```
-src/app/                 # páginas y API routes
-src/components/          # UI (player protegido, admin, etc.)
-src/lib/                 # auth, prisma, mercadopago, certificados
-prisma/schema.prisma     # modelo de datos
-uploads/                 # videos y PDFs (no versionado)
-```
-
-Cuando tengas el **nombre de dominio**, lo configuramos en `APP_URL` / DNS y dejamos listo el SSL + Mercado Pago en producción.
+Cambiar en `prisma/schema.prisma` a `provider = "mysql"` y el `DATABASE_URL` de DonWeb.
