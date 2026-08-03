@@ -1,25 +1,13 @@
 ========================================
-  NO USES F5 EN VISUAL STUDIO
+  DOBLE CLIC EN:  ABRIR.bat
 ========================================
 
-El error:
-  visualstudio-js-debugger.txt
-  codigo 4294967295
-  localhost:3000
-
-aparece porque Visual Studio intenta DEPURAR el navegador
-sin tener el servidor corriendo.
-
-SOLUCION:
-1. Cerra Visual Studio (o ignore F5)
-2. Doble clic en:  CORRE-ESTO.bat
-3. Esperá
-4. Abrí: http://localhost:8080
+Se abre solo en Edge:
+  http://localhost:8080
 
 Admin: admin@academia.local
 Clave:  Admin123!
 
-SQL Server debe estar corriendo:
-  LARA-NB\SQLEXPRESS02
-  base Cursosventas
+No uses F5 de Visual Studio.
+No cierres la ventana negra.
 ========================================
