@@ -26,35 +26,37 @@ Compatible con hosting + MySQL de **DonWeb** (o cualquier MySQL) y dominio propi
 - Mercado Pago SDK (Checkout Pro)
 - PDFKit para certificados
 
-## Inicio rápido (local)
+## Inicio rápido (local) — Windows
 
-### Opción A — Lo más simple en Windows
+1. Instalá **Node.js LTS**: https://nodejs.org/ (después reiniciá la PC).
+2. En la carpeta del proyecto, doble clic en:
 
-Doble clic en **`abrir-con-edge.bat`** (o en PowerShell):
+### **`start-local.bat`**
+
+Eso hace TODO solo:
+- crea `.env`
+- `npm install` si hace falta
+- crea la base SQLite + admin + curso demo
+- levanta http://localhost:3000
+- abre Microsoft Edge
+
+**Dejá la ventana negra abierta.** Si la cerrás, el sitio se cae.
+
+```
+Admin: admin@academia.local
+Clave: Admin123!
+```
+
+> SQL Server (`Cursosventas`) es opcional y se conecta después. Para arrancar YA usamos SQLite.
+
+### Alternativa por terminal
 
 ```powershell
-.\abrir-con-edge.bat
+git pull origin main
+npm run local
 ```
 
-Eso inicia Next.js y abre Edge en http://localhost:3000.  
-**Importante:** la ventana negra debe quedar abierta. Si la cerrás, el sitio deja de andar.
-
-> En Visual Studio, **Compilar** no levanta la web. Compilar ≠ ejecutar. Usá el `.bat` o F5 solo si el proyecto **CursosVentas** está marcado como inicio.
-
-### Opción B — Terminal
-
-```bash
-npm install
-cp .env.example .env
-npm run db:setup
-npm run dev
-```
-
-Abrí [http://localhost:3000](http://localhost:3000)
-
-**Admin por defecto (seed):**
-- Email: `admin@academia.local`
-- Contraseña: `Admin123!`
+> Visual Studio: **Compilar no inicia la web**. Usá `start-local.bat`.
 
 ## Configurar Mercado Pago
 

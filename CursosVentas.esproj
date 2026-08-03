@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.2191419">
   <PropertyGroup>
-    <!-- En Windows F5 debe abrir una consola con el servidor Next.js -->
-    <StartupCommand>cmd /c npm run dev</StartupCommand>
+    <!-- F5 / Iniciar = mismo arranque local unificado -->
+    <StartupCommand>cmd /c start-local.bat</StartupCommand>
     <WorkingDirectory>$(MSBuildProjectDirectory)</WorkingDirectory>
     <ShouldRunNpmInstall>false</ShouldRunNpmInstall>
     <ShouldRunBuildScript>false</ShouldRunBuildScript>

@@ -2,27 +2,20 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "msedge",
-      "request": "launch",
-      "name": "Abrir en Edge (localhost:3000)",
-      "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}/src"
-    },
-    {
       "type": "node",
       "request": "launch",
-      "name": "Next.js: npm run dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "name": "Arranque local (Next.js)",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/start-local.js"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal"
-    }
-  ],
-  "compounds": [
+    },
     {
-      "name": "CursosVentas (dev + Edge)",
-      "configurations": ["Next.js: npm run dev", "Abrir en Edge (localhost:3000)"],
-      "stopAll": true
+      "type": "msedge",
+      "request": "launch",
+      "name": "Abrir Edge",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/src"
     }
   ]
 }
