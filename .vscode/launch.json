@@ -4,21 +4,12 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Arranque local (SQL Server + :8080)",
+      "name": "Arranque local :8080",
       "runtimeExecutable": "node",
       "runtimeArgs": ["scripts/start-local.js"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
-      "env": {
-        "PORT": "8080"
-      }
-    },
-    {
-      "type": "msedge",
-      "request": "launch",
-      "name": "Abrir Edge :8080",
-      "url": "http://localhost:8080",
-      "webRoot": "${workspaceFolder}/src"
+      "env": { "PORT": "8080" }
     }
   ]
 }

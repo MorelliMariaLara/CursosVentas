@@ -1,13 +1,16 @@
 <Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.2191419">
   <PropertyGroup>
-    <!-- NO uses el depurador de browser contra :3000. Usá start-local.bat -->
-    <StartupCommand>cmd /c start-local.bat</StartupCommand>
+    <!--
+      Visual Studio NO debe depurar el browser.
+      F5 / Iniciar abre una consola aparte con start-local.bat (puerto 8080).
+    -->
+    <StartupCommand>cmd /c start "Academia Certifica" cmd /k start-local.bat</StartupCommand>
     <WorkingDirectory>$(MSBuildProjectDirectory)</WorkingDirectory>
     <ShouldRunNpmInstall>false</ShouldRunNpmInstall>
     <ShouldRunBuildScript>false</ShouldRunBuildScript>
     <BuildCommand></BuildCommand>
     <CleanCommand></CleanCommand>
-    <LaunchUrl>http://localhost:8080</LaunchUrl>
-    <ApplicationUrl>http://localhost:8080</ApplicationUrl>
+    <LaunchUrl></LaunchUrl>
+    <ApplicationUrl></ApplicationUrl>
   </PropertyGroup>
 </Project>

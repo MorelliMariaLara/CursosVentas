@@ -1,23 +1,25 @@
 ========================================
-  LEEME — COMO VER LA WEB
+  NO USES F5 EN VISUAL STUDIO
 ========================================
 
-NO uses F5 / Depurar en Visual Studio.
-Eso abre Edge a un puerto vacío y muestra error.
+El error:
+  visualstudio-js-debugger.txt
+  codigo 4294967295
+  localhost:3000
 
-1) Asegurate de tener SQL Server corriendo
-   Instancia: LARA-NB\SQLEXPRESS02
-   Base:      Cursosventas
+aparece porque Visual Studio intenta DEPURAR el navegador
+sin tener el servidor corriendo.
 
-2) Doble clic en:  start-local.bat
-
-3) Esperá a que diga listo
-
-4) Abrí en el navegador:
-   http://localhost:8080
+SOLUCION:
+1. Cerra Visual Studio (o ignore F5)
+2. Doble clic en:  CORRE-ESTO.bat
+3. Esperá
+4. Abrí: http://localhost:8080
 
 Admin: admin@academia.local
 Clave:  Admin123!
 
-Dejá la ventana negra ABIERTA.
-Si la cerrás, Edge da ERR_CONNECTION_REFUSED.
+SQL Server debe estar corriendo:
+  LARA-NB\SQLEXPRESS02
+  base Cursosventas
+========================================

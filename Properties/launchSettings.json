@@ -1,15 +1,11 @@
 {
   "profiles": {
-    "CursosVentas": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "http://localhost:8080",
-      "environmentVariables": {
-        "PORT": "8080",
-        "NEXTAUTH_URL": "http://localhost:8080",
-        "APP_URL": "http://localhost:8080"
-      },
-      "applicationUrl": "http://localhost:8080"
+    "CursosVentas (sin depurar browser)": {
+      "commandName": "Executable",
+      "executablePath": "cmd.exe",
+      "commandLineArgs": "/c start-local.bat",
+      "workingDirectory": ".",
+      "launchBrowser": false
     }
   }
 }
