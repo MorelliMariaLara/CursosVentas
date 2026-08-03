@@ -28,23 +28,18 @@ Compatible con hosting + MySQL de **DonWeb** (o cualquier MySQL) y dominio propi
 
 ## Inicio rápido (local)
 
-### Opción A — Visual Studio (archivo `.sln`)
+### Opción A — Lo más simple en Windows
 
-1. Abrí una **PowerShell** o **CMD** en la carpeta del proyecto y corré **una sola vez**:
+Doble clic en **`abrir-con-edge.bat`** (o en PowerShell):
 
 ```powershell
-.\setup-windows.bat
+.\abrir-con-edge.bat
 ```
 
-(o manualmente: `npm install`, `copy .env.example .env`, `npm run db:setup`)
+Eso inicia Next.js y abre Edge en http://localhost:3000.  
+**Importante:** la ventana negra debe quedar abierta. Si la cerrás, el sitio deja de andar.
 
-2. Abrí **`CursosVentas.sln`** con Visual Studio 2022.
-3. Seleccioná el proyecto **CursosVentas** y pulsá **F5**.  
-   Eso ejecuta `npm run dev` → [http://localhost:3000](http://localhost:3000).
-
-> El `.sln` **no** corre `npm install` solo (en VS suele fallar). Las dependencias se instalan con `setup-windows.bat`.
-
-> Requiere **Node.js LTS**: https://nodejs.org/ — después de instalarlo, cerrá y reabrí la terminal/VS.
+> En Visual Studio, **Compilar** no levanta la web. Compilar ≠ ejecutar. Usá el `.bat` o F5 solo si el proyecto **CursosVentas** está marcado como inicio.
 
 ### Opción B — Terminal
 

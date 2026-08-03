@@ -1,23 +1,11 @@
 <Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.2191419">
   <PropertyGroup>
-    <!-- F5 ejecuta el servidor de desarrollo -->
-    <StartupCommand>npm run dev</StartupCommand>
+    <!-- En Windows F5 debe abrir una consola con el servidor Next.js -->
+    <StartupCommand>cmd /c npm run dev</StartupCommand>
     <WorkingDirectory>$(MSBuildProjectDirectory)</WorkingDirectory>
-    <!--
-      Visual Studio suele fallar al correr "npm install" interno
-      (PATH / Node). Lo desactivamos: instalá dependencias una vez
-      en PowerShell fuera del build de VS.
-    -->
     <ShouldRunNpmInstall>false</ShouldRunNpmInstall>
     <ShouldRunBuildScript>false</ShouldRunBuildScript>
-    <BuildCommand>
-    </BuildCommand>
-    <CleanCommand>
-    </CleanCommand>
+    <BuildCommand></BuildCommand>
+    <CleanCommand></CleanCommand>
   </PropertyGroup>
-  <ItemGroup>
-    <None Include=".bin\git.cmd" />
-    <None Include=".bin\node.cmd" />
-    <None Include=".bin\npm.cmd" />
-  </ItemGroup>
 </Project>
