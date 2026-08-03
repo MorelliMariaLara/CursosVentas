@@ -28,6 +28,8 @@
 *.suo
 *.userosscache
 *.sln.docstates
+obj/
+bin/
 
 # debug
 npm-debug.log*

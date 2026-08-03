@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  // En producción (DonWeb): provider = "mysql"
-  // En desarrollo local: sqlite para poder probar sin servidor MySQL
+  // Local rápido: "sqlite"
+  // SQL Server Express (LARA-NB\SQLEXPRESS02): "sqlserver"
+  // DonWeb: "mysql"
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
