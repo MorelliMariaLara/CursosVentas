@@ -30,3 +30,17 @@ Doble clic en `ABRIR.bat`
 
 - Node.js **20 LTS** (evitar Node 24 en Windows)
 - Visual Studio 2022 con workload de desarrollo .NET (para el Launcher)
+
+## Si `npm install` falla
+
+1. Cerrá Visual Studio y cualquier ventana del sitio
+2. En la carpeta del proyecto, borrá `node_modules` (si existe)
+3. Borrá también `.bin` y `packages` si aparecen (restos viejos de NuGet)
+4. Abrí una terminal en la carpeta y ejecutá:
+
+```bat
+npm install
+ABRIR.bat
+```
+
+Usá el Node del sistema (`node -v` debe mostrar v20.x), no herramientas viejas de NuGet.
