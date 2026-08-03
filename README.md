@@ -1,31 +1,37 @@
-# Academia Certifica
+# Academia Certifica — Sitio web de cursos
 
-## Ver la app (una sola acción)
+Aplicación **web** para vender cursos en video, pagar con Mercado Pago,
+rendir examen y emitir certificados.
 
-1. Instalá Node.js LTS: https://nodejs.org/ → reiniciá la PC  
-2. **Doble clic** en:
+## Cómo verlo (Windows)
 
-# `ABRIR.bat`
+1. Instalá [Node.js LTS](https://nodejs.org/) y reiniciá la PC (solo una vez).
+2. En la carpeta del proyecto, **doble clic** en:
 
-Eso prepara todo, levanta la web y abre **Microsoft Edge** en:
+### `ABRIR.bat`
 
-**http://localhost:8080**
+3. Se abre el navegador en **http://localhost:8080**
 
 ```
 Admin: admin@academia.local
 Clave:  Admin123!
 ```
 
-Dejá la ventana negra abierta.
+No cierres la ventana negra mientras uses el sitio.
 
----
+## Qué incluye el sitio
 
-## SQL Server (opcional, después)
+- `/` — Inicio
+- `/cursos` — Catálogo
+- `/cursos/[slug]` — Detalle y compra
+- `/login` `/registro` — Acceso
+- `/mis-cursos` — Aula del alumno
+- `/aprender/[slug]` — Videos protegidos
+- `/admin` — Panel para subir cursos/videos/exámenes
+- `/verificar` — Validar certificados
 
-Cuando la UI ya te funcione y quieras usar `LARA-NB\SQLEXPRESS02` / `Cursosventas`:
+## SQL Server / DonWeb
 
-1. Copiá `prisma/schema.sqlserver.prisma` → `prisma/schema.prisma`
-2. En `.env` poné el `DATABASE_URL` de SQL Server
-3. `npx prisma generate` && `npx prisma db push` && `npm run db:seed`
-
-Scripts SQL en `sql/sqlserver/`.
+- Local ya funciona con SQLite (incluido en `ABRIR.bat`).
+- SQL Server: ver `prisma/schema.sqlserver.prisma` y `sql/sqlserver/`.
+- DonWeb MySQL: cambiar `provider` a `mysql` y el `DATABASE_URL`.

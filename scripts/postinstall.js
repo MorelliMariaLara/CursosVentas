@@ -1,6 +1,5 @@
 /**
- * Asegura .env local y genera el cliente de Prisma.
- * Evita que `npm install` falle en Windows si todavía no existe .env.
+ * Asegura .env y genera Prisma Client tras npm install.
  */
 const fs = require("fs");
 const path = require("path");
@@ -10,9 +9,15 @@ const root = process.cwd();
 const envPath = path.join(root, ".env");
 const examplePath = path.join(root, ".env.example");
 
-if (!fs.existsSync(envPath) && fs.existsSync(examplePath)) {
-  fs.copyFileSync(examplePath, envPath);
-  console.log("Se creó .env desde .env.example");
+if (!fs.existsSync(envPath)) {
+  if (fs.existsSync(examplePath)) {
+    fs.copyFileSync(examplePath, envPath);
+  } else {
+    fs.writeFileSync(
+      envPath,
+      'DATABASE_URL="file:./dev.db"\nAUTH_SECRET="dev-secret"\nNEXTAUTH_URL="http://localhost:8080"\nAPP_URL="http://localhost:8080"\n',
+    );
+  }
 }
 
 const result = spawnSync("npx", ["prisma", "generate"], {
@@ -25,10 +30,4 @@ const result = spawnSync("npx", ["prisma", "generate"], {
   },
 });
 
-if (result.status !== 0) {
-  console.warn(
-    "Aviso: prisma generate no completó. Después de npm install corré: npx prisma generate",
-  );
-  // No abortamos npm install por esto
-  process.exit(0);
-}
+process.exit(result.status === 0 ? 0 : 0);
