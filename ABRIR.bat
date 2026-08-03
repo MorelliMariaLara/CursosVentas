@@ -43,20 +43,42 @@ if %MAJOR% GEQ 24 (
   echo.
 )
 
+REM Evitar que un NODE_ENV=production omita prisma/tsx
+set NODE_ENV=
+set NPM_CONFIG_PRODUCTION=false
+
+REM Quitar del PATH wrappers viejos de NuGet (.bin del proyecto)
+set "PATH=%ProgramFiles%\nodejs;%ProgramFiles(x86)%\nodejs;%PATH%"
+
 echo  Si falla, borra la carpeta node_modules y reintenta.
 echo  NO CIERRES ESTA VENTANA
 echo.
 
-if not exist "node_modules\next" (
-  echo  Instalando dependencias...
-  call npm install
-  if errorlevel 1 (
-    echo  npm install fallo. Proba con Node 20 LTS.
-    pause
-    exit /b 1
-  )
+if not exist "node_modules\next" goto INSTALL
+if not exist "node_modules\.bin\prisma.cmd" goto INSTALL
+if not exist "node_modules\.bin\tsx.cmd" goto INSTALL
+goto RUN
+
+:INSTALL
+echo  Instalando dependencias...
+if exist "node_modules" (
+  echo  Limpiando node_modules incompleto...
+  rmdir /s /q "node_modules" 2>nul
+)
+call npm install --include=dev --no-fund --no-audit
+if errorlevel 1 (
+  echo.
+  echo  npm install fallo.
+  echo  Proba esto en una terminal abierta en esta carpeta:
+  echo    rmdir /s /q node_modules
+  echo    npm install
+  echo  Usa Node 20 LTS: https://nodejs.org/
+  echo.
+  pause
+  exit /b 1
 )
 
+:RUN
 node scripts\start-local.js
 echo.
 pause

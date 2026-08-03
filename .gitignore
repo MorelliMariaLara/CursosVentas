@@ -30,7 +30,9 @@
 *.sln.docstates
 obj/
 bin/
+.bin/
 packages/
+packages.config
 launcher/bin/
 launcher/obj/
 
