@@ -2,9 +2,9 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "chrome",
+      "type": "msedge",
       "request": "launch",
-      "name": "Abrir Academia (localhost:3000)",
+      "name": "Abrir en Edge (localhost:3000)",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}/src"
     },
@@ -20,8 +20,8 @@
   ],
   "compounds": [
     {
-      "name": "CursosVentas (dev + browser)",
-      "configurations": ["Next.js: npm run dev", "Abrir Academia (localhost:3000)"],
+      "name": "CursosVentas (dev + Edge)",
+      "configurations": ["Next.js: npm run dev", "Abrir en Edge (localhost:3000)"],
       "stopAll": true
     }
   ]
