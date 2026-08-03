@@ -1,5 +1,5 @@
 /**
- * Asegura .env y genera Prisma Client tras npm install.
+ * postinstall: genera Prisma sin usar npx (más estable en Windows).
  */
 const fs = require("fs");
 const path = require("path");
@@ -20,7 +20,17 @@ if (!fs.existsSync(envPath)) {
   }
 }
 
-const result = spawnSync("npx", ["prisma", "generate"], {
+const isWin = process.platform === "win32";
+const prismaCmd = isWin
+  ? path.join(root, "node_modules", ".bin", "prisma.cmd")
+  : path.join(root, "node_modules", ".bin", "prisma");
+
+if (!fs.existsSync(prismaCmd)) {
+  console.warn("postinstall: prisma aún no está instalado, se omite generate");
+  process.exit(0);
+}
+
+const result = spawnSync(prismaCmd, ["generate"], {
   cwd: root,
   stdio: "inherit",
   shell: true,
@@ -30,4 +40,4 @@ const result = spawnSync("npx", ["prisma", "generate"], {
   },
 });
 
-process.exit(result.status === 0 ? 0 : 0);
+process.exit(0);

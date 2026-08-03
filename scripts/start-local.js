@@ -1,5 +1,6 @@
 /**
  * Arranque web local: SQLite + Next.js :8080 + Edge
+ * Evita `npx` (rompe en Node 24 / Windows) y usa binarios locales.
  */
 const fs = require("fs");
 const path = require("path");
@@ -15,11 +16,13 @@ const EDGE_URL = `http://localhost:${PORT}`;
 function log(m) {
   console.log(`\n==> ${m}`);
 }
+
 function fail(m) {
   console.error(`\nERROR: ${m}`);
   if (isWin) spawnSync("pause", { shell: true, stdio: "inherit" });
   process.exit(1);
 }
+
 function run(cmd, args, extraEnv = {}) {
   const r = spawnSync(cmd, args, {
     cwd: root,
@@ -27,7 +30,49 @@ function run(cmd, args, extraEnv = {}) {
     shell: true,
     env: { ...process.env, ...extraEnv },
   });
-  if (r.status !== 0) fail(`Comando falló: ${cmd} ${args.join(" ")}`);
+  if (r.status !== 0) {
+    fail(`Comando falló: ${cmd} ${args.join(" ")}`);
+  }
+}
+
+function bin(name) {
+  const unix = path.join(root, "node_modules", ".bin", name);
+  const win = path.join(root, "node_modules", ".bin", `${name}.cmd`);
+  if (isWin && fs.existsSync(win)) return win;
+  if (fs.existsSync(unix)) return unix;
+  return null;
+}
+
+function runLocal(name, args, extraEnv = {}) {
+  const b = bin(name);
+  if (!b) {
+    fail(
+      `No se encontró ${name} en node_modules.\n` +
+        "Borrá la carpeta node_modules y volvé a ejecutar ABRIR.bat",
+    );
+  }
+  run(b, args, extraEnv);
+}
+
+function ensureNode() {
+  const v = spawnSync("node", ["-v"], { encoding: "utf8", shell: true });
+  if (v.status !== 0) {
+    fail("Instalá Node.js 20 LTS desde https://nodejs.org/ y reiniciá la PC.");
+  }
+  const version = String(v.stdout || "").trim();
+  console.log("Node " + version);
+  const major = Number((version.match(/^v(\d+)/) || [])[1] || 0);
+  if (major >= 24) {
+    console.log("");
+    console.log("AVISO: Node " + major + " puede fallar con Prisma en Windows.");
+    console.log("Si ves errores, instalá Node.js 20 LTS:");
+    console.log("  https://nodejs.org/  (elegí la versión 20 LTS)");
+    console.log("Luego reiniciá la PC, borrá node_modules y ejecutá ABRIR.bat");
+    console.log("");
+  }
+  if (major > 0 && major < 18) {
+    fail("Node es muy viejo. Instalá Node.js 20 LTS: https://nodejs.org/");
+  }
 }
 
 function ensureEnv() {
@@ -67,6 +112,9 @@ function ensureDeps() {
   if (!fs.existsSync(path.join(root, "node_modules", "next"))) {
     log("Instalando paquetes web (npm install)...");
     run("npm", ["install"]);
+  } else if (!bin("prisma") || !bin("tsx")) {
+    log("Faltan herramientas. Reinstalando paquetes...");
+    run("npm", ["install"]);
   } else {
     log("Paquetes OK");
   }
@@ -75,9 +123,9 @@ function ensureDeps() {
 function ensureDb() {
   const env = { DATABASE_URL: "file:./dev.db" };
   log("Base de datos local...");
-  run("npx", ["prisma", "generate"], env);
-  run("npx", ["prisma", "db", "push", "--accept-data-loss"], env);
-  run("npx", ["tsx", "prisma/seed.ts"], env);
+  runLocal("prisma", ["generate"], env);
+  runLocal("prisma", ["db", "push", "--accept-data-loss"], env);
+  runLocal("tsx", ["prisma/seed.ts"], env);
 }
 
 function waitReady() {
@@ -104,9 +152,8 @@ async function openBrowser() {
     console.warn("\nAbrí el navegador en: " + EDGE_URL);
     return;
   }
-  log("Abriendo el sitio en el navegador...");
+  log("Abriendo el sitio en Edge...");
   if (isWin) {
-    // Edge primero; si no está, el navegador por defecto
     spawn("cmd", ["/c", "start", "", "msedge", EDGE_URL], {
       detached: true,
       stdio: "ignore",
@@ -116,7 +163,7 @@ async function openBrowser() {
         detached: true,
         stdio: "ignore",
       }).unref();
-    }, 2000);
+    }, 2500);
   }
 }
 
@@ -126,12 +173,7 @@ async function main() {
   console.log("  " + EDGE_URL);
   console.log("========================================");
 
-  const v = spawnSync("node", ["-v"], { encoding: "utf8", shell: true });
-  if (v.status !== 0) {
-    fail("Instalá Node.js LTS: https://nodejs.org/");
-  }
-  console.log("Node " + String(v.stdout).trim());
-
+  ensureNode();
   ensureEnv();
   ensureUploads();
   ensureDeps();
@@ -143,9 +185,13 @@ async function main() {
 
   openBrowser();
 
+  // Prefer local next binary over npx
+  const nextBin = bin("next");
   const child = spawn(
-    "npx",
-    ["next", "dev", "-H", "127.0.0.1", "-p", PORT],
+    nextBin || "npx",
+    nextBin
+      ? ["dev", "-H", "127.0.0.1", "-p", PORT]
+      : ["next", "dev", "-H", "127.0.0.1", "-p", PORT],
     {
       cwd: root,
       stdio: "inherit",

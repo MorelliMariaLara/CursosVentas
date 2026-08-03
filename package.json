@@ -2,6 +2,9 @@
   "name": "cursos-ventas",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20 <24"
+  },
   "scripts": {
     "dev": "next dev -H 127.0.0.1 -p 8080",
     "build": "prisma generate && next build",
