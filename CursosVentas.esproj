@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.2191419">
+  <PropertyGroup>
+    <!-- Comando que Visual Studio ejecuta al iniciar (F5 / botón verde) -->
+    <StartupCommand>npm run dev</StartupCommand>
+    <WorkingDirectory>$(MSBuildProjectDirectory)</WorkingDirectory>
+    <ShouldRunNpmInstall>true</ShouldRunNpmInstall>
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <BuildCommand></BuildCommand>
+    <CleanCommand></CleanCommand>
+  </PropertyGroup>
+</Project>

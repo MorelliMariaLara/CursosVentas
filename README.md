@@ -28,6 +28,24 @@ Compatible con hosting + MySQL de **DonWeb** (o cualquier MySQL) y dominio propi
 
 ## Inicio rápido (local)
 
+### Opción A — Visual Studio (archivo `.sln`)
+
+1. Abrí **`CursosVentas.sln`** con Visual Studio 2022.
+2. La primera vez, en la **Terminal de Visual Studio** (o PowerShell) corré:
+
+```powershell
+npm install
+copy .env.example .env
+npm run db:setup
+```
+
+3. Seleccioná el proyecto **CursosVentas** como inicio y pulsá **F5** (o el botón verde).  
+   Eso ejecuta `npm run dev` y la app queda en [http://localhost:3000](http://localhost:3000).
+
+> Requiere **Node.js LTS** instalado y, en Visual Studio, la workload de desarrollo web / JavaScript.
+
+### Opción B — Terminal
+
 ```bash
 npm install
 cp .env.example .env
