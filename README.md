@@ -30,19 +30,21 @@ Compatible con hosting + MySQL de **DonWeb** (o cualquier MySQL) y dominio propi
 
 ### Opción A — Visual Studio (archivo `.sln`)
 
-1. Abrí **`CursosVentas.sln`** con Visual Studio 2022.
-2. La primera vez, en la **Terminal de Visual Studio** (o PowerShell) corré:
+1. Abrí una **PowerShell** o **CMD** en la carpeta del proyecto y corré **una sola vez**:
 
 ```powershell
-npm install
-copy .env.example .env
-npm run db:setup
+.\setup-windows.bat
 ```
 
-3. Seleccioná el proyecto **CursosVentas** como inicio y pulsá **F5** (o el botón verde).  
-   Eso ejecuta `npm run dev` y la app queda en [http://localhost:3000](http://localhost:3000).
+(o manualmente: `npm install`, `copy .env.example .env`, `npm run db:setup`)
 
-> Requiere **Node.js LTS** instalado y, en Visual Studio, la workload de desarrollo web / JavaScript.
+2. Abrí **`CursosVentas.sln`** con Visual Studio 2022.
+3. Seleccioná el proyecto **CursosVentas** y pulsá **F5**.  
+   Eso ejecuta `npm run dev` → [http://localhost:3000](http://localhost:3000).
+
+> El `.sln` **no** corre `npm install` solo (en VS suele fallar). Las dependencias se instalan con `setup-windows.bat`.
+
+> Requiere **Node.js LTS**: https://nodejs.org/ — después de instalarlo, cerrá y reabrí la terminal/VS.
 
 ### Opción B — Terminal
 
